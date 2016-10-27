@@ -1,5 +1,6 @@
+SHAPEMapper_v1.2_SER 
 
-# This ShapeMapper version is modified to generate reactivity profiles for single end sequenced reads.
+ #SHAPEMapper_v1.2_SER is a modified version of ShapeMapper /ref[http://www.chem.unc.edu/rna/software.html], it allows to generate reactivity profiles for single end sequenced reads.
 @author Afaf saaidi 2016
 
 #the original version is ShapeMapper version 1.2 (Copyright Steven Busan 2015)
