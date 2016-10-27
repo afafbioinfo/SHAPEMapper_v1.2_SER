@@ -1,7 +1,7 @@
 SHAPEMapper_v1.2_SER 
 
- #SHAPEMapper_v1.2_SER is a modified version of ShapeMapper /ref[http://www.chem.unc.edu/rna/software.html],it allows
- to generate reactivity profiles for single end sequenced reads.
+ #SHAPEMapper_v1.2_SER is a modified version of ShapeMapper /ref[http://www.chem.unc.edu/rna/software.html].
+ SHAPEMapper_v1.2_SER allows to generate reactivity profiles for single end sequenced reads.
 @author Afaf saaidi 2016
 
 #the original version is ShapeMapper version 1.2 (Copyright Steven Busan 2015)
@@ -37,6 +37,7 @@ Execution instructions:
         cd to the ShapeMapper directory
         run the command "make"
         
+Generate sequence alignment files using ReadsMap program [https://github.com/afafbioinfo/ReadsMap]
 Add sequence alignment files  to output/aligned_reads/
 Add reference sequence files to output/fasta_file/
 run the command: ShapeMapper.py
