@@ -26,14 +26,18 @@ sys.stdout =Fct.Logger("Logfile.txt")
 #print Experiments[0],Experiments[1]
 ListRNAs=Fct.GetListFile(fastaDir, FastaFileExtension)
 #print ListRNAs
-'''
+
 #1 Run parseAlignment.cpp Parse aligned reads
 try:
+    mutationstringDir = os.path.join(outputDir, "mutation_strings/")
+    Fct.CheckFolderExist(mutationstringDir)
     alignedFileList = os.listdir(alignmentDir)
     samFilePathDict = {} # sample name:aligned file path
     indexPathDict = {} # sample name:reference fasta file path
+    listsamples=[]
     for filee in alignedFileList:
         sampleName=filee.split(".")[0]
+        listsamples.append(sampleName)
         #print sampleName
         samFilePathDict[sampleName] = os.path.join(alignmentDir,filee)
         indexPathDict[sampleName] = os.path.join( fastaDir,sampleName+"."+FastaFileExtension)
@@ -45,14 +49,13 @@ try:
         for i in range(len(options)):
                 if selected[i] == True:
                     argList.append(options[i])
-        mutationstringDir=os.path.join(outputDir,"mutation_strings/")
         argList += ["-primer_length", str(10),
         "-min_map_qual", str(30),
          "-ref_seqs", indexPathDict[sampleName],
         "-file_in",samFilePathDict[sampleName],
          "-out_folder",mutationstringDir ]
-        if removeAmbigDel==True:
-                argList += ["-remove_ambig_del"]
+        #if removeAmbigDel==True:
+        argList += ["-remove_ambig_del"]
         argListDict[sampleName] = argList
 
         sampleNameList=[sampleName]
@@ -71,40 +74,41 @@ except:
     print errorString
     sys.exit(1)
 
+
 #-------------------------------------------------------------------------------------------
 #2 Run Count mutations
 
 try:
     print "\nStarting mutation counting at %s\n"%(Fct.timeStamp())
     # get list of parsed mutation string files
-    #mutationStringDir = os.path.join(outputDir,"mutation_strings/")
-    folderFileList = os.listdir(mutationstringDir)
+    mutationStringDir = os.path.join(outputDir,"mutation_strings/")
+    folderFileList = os.listdir(mutationStringDir)
     argListDict = {}
     txtFileList = []
+    csvDir = os.path.join(outputDir, "counted_mutations")
+    Fct.CheckFolderExist(csvDir)
+    #print ListRNAs,"jsut in case"
     for sampleName in ListRNAs:
         for target in Experiments:
             fileName = sampleName+"."+target+"_"+sampleName+".txt"
+            #print fileName,"here we rae"
+            # fileName in folderFileList:
+            filePath = os.path.join(mutationStringDir,fileName)
+            txtFileList.append(fileName)
+            refPath =  os.path.join(fastaDir,sampleName+"."+FastaFileExtension)
+            outPath = os.path.join(csvDir,sampleName+"_"+target+".csv")
+            #print csvDir+"sampleName+"+target
+            # mutations with associated phred scores below the minPhredToCount threshold are ignored
+            argList = ["./countMutations",
+                        "-file_in", filePath,
+                        "-ref_seqs", refPath,
+                        "-sample_name", sampleName,
+                        "-target_name", sampleName,
+                        "-file_out", outPath,
+                        "-min_phred", str(minphredtocount)]
 
-            if fileName in folderFileList:
-                filePath = os.path.join(mutationstringDir,fileName)
-                txtFileList.append(fileName)
-                refPath =  os.path.join(fastaDir,sampleName+"."+FastaFileExtension)
-                csvDir=os.path.join(outputDir, "counted_mutations")
-                Fct.CheckFolderExist(csvDir)
-                outPath = os.path.join(csvDir,sampleName+"_"+target+".csv")
-                # mutations with associated phred scores below the minPhredToCount threshold are ignored
-                argList = ["./countMutations",
-                            "-file_in", filePath,
-                            "-ref_seqs", refPath,
-                            "-sample_name", sampleName,
-                            "-target_name", sampleName,
-                            "-file_out", outPath,
-                            "-min_phred", str(minphredtocount)]
-
-                argListDict[fileName] = argList
-
-
-    stdOuts, stdErrs = Fct.spawnProcesses(maxProc, txtFileList, argListDict)
+            argListDict[fileName] = argList
+            stdOuts, stdErrs = Fct.spawnProcesses(maxProc,[fileName], argListDict)
 
     for fileName in stdErrs:
 
@@ -130,7 +134,7 @@ except:
 
     print errorString
     sys.exit(1)
-'''
+
 #---------------------------------------------------------------------------------------
 #3 Generate final reactivity profiles
 
